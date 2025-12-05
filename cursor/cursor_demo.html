@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Magnetic Cursor Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --cursor-size: 20px;
+            --cursor-outline-size: 40px;
+            --color-primary: #64ffda;
+            --color-bg: #0a192f;
+            --color-text: #e6f1ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            overflow-x: hidden;
+            /* Default to "Follow" mode (system cursor visible initially) */
+            cursor: default; 
+            transition: background 0.3s;
+        }
+
+        /* --- Cursor Styles --- */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+            will-change: transform, width, height, background-color;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: white;
+        }
+
+        .cursor-outline {
+            width: var(--cursor-outline-size);
+            height: var(--cursor-outline-size);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
+        }
+
+        /* Mode: Replace Default Cursor */
+        body.mode-replace {
+            cursor: none;
+        }
+        body.mode-replace a, 
+        body.mode-replace button,
+        body.mode-replace input {
+            cursor: none;
+        }
+
+        /* States */
+        
+        /* Hovering Text */
+        body.is-hovering-text .cursor-outline {
+            width: 4px;
+            height: 30px;
+            border-radius: 2px;
+            background-color: var(--color-primary);
+            border: none;
+            opacity: 0.8;
+        }
+        body.is-hovering-text .cursor-dot {
+            opacity: 0;
+        }
+
+        /* Hovering Button/Link (Magnetic) */
+        body.is-hovering-link .cursor-outline {
+            background-color: rgba(100, 255, 218, 0.1);
+            border-color: transparent;
+            /* Size will be handled by JS for magnetic effect, 
+               but here are defaults if JS doesn't override size */
+            width: 60px; 
+            height: 60px;
+        }
+        body.is-hovering-link .cursor-dot {
+            background-color: var(--color-primary);
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+
+        /* Active (Click) State */
+        body.is-pressed .cursor-outline {
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+        body.is-pressed .cursor-dot {
+            transform: translate(-50%, -50%) scale(0.5);
+        }
+
+
+        /* --- Demo Layout --- */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 4rem;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        p.subtitle {
+            font-size: 1.2rem;
+            color: #8892b0;
+            max-width: 600px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+
+        .switch-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #8892b0;
+        }
+
+        /* Interactive Elements */
+        .interactive-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card {
+            padding: 2rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            transition: 0.3s;
+        }
+        .card:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-5px);
+        }
+
+        button.magnetic-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            background: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+            border-radius: 30px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .text-block {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #a8b2d1;
+        }
+        .text-block span {
+            color: var(--color-primary);
+            font-weight: bold;
+            display: inline-block; /* Better for detection */
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--color-primary); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Cursor Elements -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="switch-row">
+            <span>Hide Default Cursor</span>
+            <label class="toggle">
+                <input type="checkbox" id="cursor-mode-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="container">
+        <div>
+            <h1 data-magnetic="true" data-magnetic-force="0.2">Magnetic Cursor</h1>
+            <p class="subtitle">
+                An interactive cursor that <span data-type="text">adapts to context</span>. 
+                Move around to see the magnetic snap, text selection mode, and click effects.
+            </p>
+        </div>
+
+        <button class="magnetic-btn" data-magnetic="true" data-magnetic-force="0.5">
+            Hover Me (Magnetic)
+        </button>
+
+        <div class="interactive-grid">
+            <div class="card">
+                <h3>Text Context</h3>
+                <p class="text-block">
+                    Hover over this <span data-type="text">highlighted text</span> to see the cursor change into a text-selection bar, indicating it's selectable or special.
+                </p>
+            </div>
+            <div class="card" data-magnetic="true" data-magnetic-force="0.1">
+                <h3>Card Magnet</h3>
+                <p class="text-block">
+                    The entire card can be magnetic too. The cursor will gently pull towards the center of this box.
+                </p>
+            </div>
+            <div class="card">
+                <h3>Standard Links</h3>
+                <p class="text-block">
+                    <a href="#" style="color: var(--color-primary); text-decoration: none;">Standard links</a> trigger the active state without magnetic pull, unless configured otherwise.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const config = {
+            smoothing: 0.15, // 0-1, lower is smoother/slower
+            magneticForce: 0.3,
+            defaultOutlineSize: 40
+        };
+
+        // --- Elements ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        const toggle = document.getElementById('cursor-mode-toggle');
+        const body = document.body;
+
+        // --- State ---
+        let mouse = { x: 0, y: 0 };
+        let cursor = { x: 0, y: 0 }; // Current position of outline
+        let isHoveringMagnetic = false;
+        let magneticTarget = null;
+        let magneticRect = null;
+
+        // --- Initialization ---
+        // Center cursor initially
+        mouse.x = window.innerWidth / 2;
+        mouse.y = window.innerHeight / 2;
+        cursor.x = mouse.x;
+        cursor.y = mouse.y;
+
+        // Toggle Mode
+        toggle.addEventListener('change', (e) => {
+            if(e.target.checked) {
+                body.classList.add('mode-replace');
+            } else {
+                body.classList.remove('mode-replace');
+            }
+        });
+
+        // --- Mouse Tracking ---
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            
+            // Immediate update for dot
+            gsap.to(cursorDot, {
+                x: mouse.x,
+                y: mouse.y,
+                duration: 0.1
+            });
+        });
+
+        window.addEventListener('mousedown', () => {
+            body.classList.add('is-pressed');
+        });
+
+        window.addEventListener('mouseup', () => {
+            body.classList.remove('is-pressed');
+        });
+
+        // --- Element Detection ---
+        const interactiveElements = document.querySelectorAll('a, button, [data-magnetic], [data-type="text"]');
+        
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', (e) => {
+                const type = el.getAttribute('data-type');
+                const isMagnetic = el.getAttribute('data-magnetic') === 'true';
+
+                if (type === 'text') {
+                    body.classList.add('is-hovering-text');
+                } else {
+                    body.classList.add('is-hovering-link');
+                }
+
+                if (isMagnetic) {
+                    isHoveringMagnetic = true;
+                    magneticTarget = el;
+                    magneticRect = el.getBoundingClientRect();
+                    
+                    // Optional: Get custom force
+                    const force = parseFloat(el.getAttribute('data-magnetic-force')) || config.magneticForce;
+                    
+                    // Animate outline to target size/shape if needed
+                    // Here we just scale it up a bit or match button size? 
+                    // For this demo, let's keep it circular but maybe larger
+                    gsap.to(cursorOutline, {
+                        width: 60,
+                        height: 60,
+                        duration: 0.3
+                    });
+                }
+            });
+
+            el.addEventListener('mouseleave', () => {
+                body.classList.remove('is-hovering-text');
+                body.classList.remove('is-hovering-link');
+                
+                if (isHoveringMagnetic) {
+                    isHoveringMagnetic = false;
+                    magneticTarget = null;
+                    
+                    // Reset size
+                    gsap.to(cursorOutline, {
+                        width: config.defaultOutlineSize,
+                        height: config.defaultOutlineSize,
+                        duration: 0.3
+                    });
+                }
+            });
+        });
+
+        // --- Animation Loop ---
+        function animate() {
+            let targetX = mouse.x;
+            let targetY = mouse.y;
+
+            if (isHoveringMagnetic && magneticTarget) {
+                // Update rect in case of scroll/movement
+                magneticRect = magneticTarget.getBoundingClientRect();
+                
+                const centerX = magneticRect.left + magneticRect.width / 2;
+                const centerY = magneticRect.top + magneticRect.height / 2;
+                
+                // Magnetic pull calculation
+                // The cursor outline is attracted to the center of the element
+                // But we still want it to move slightly with the mouse (relative movement)
+                
+                const force = parseFloat(magneticTarget.getAttribute('data-magnetic-force')) || config.magneticForce;
+                
+                // Calculate distance from center
+                const distFromCenterX = mouse.x - centerX;
+                const distFromCenterY = mouse.y - centerY;
+                
+                // Apply magnetic attraction: 
+                // Target position is Center + (Distance * (1 - Force))
+                // Force 1.0 = Stuck to center exactly
+                // Force 0.0 = No magnetism (normal follow)
+                
+                targetX = centerX + (distFromCenterX * (1 - force));
+                targetY = centerY + (distFromCenterY * (1 - force));
+                
+                // Also move the element itself slightly towards the mouse (Magnetic Button Effect)
+                // Only if it's a button or small element, usually not large cards
+                if (magneticTarget.tagName === 'BUTTON' || magneticTarget.tagName === 'H1') {
+                    gsap.to(magneticTarget, {
+                        x: distFromCenterX * 0.2,
+                        y: distFromCenterY * 0.2,
+                        duration: 0.5,
+                        ease: "power2.out"
+                    });
+                }
+            }
+
+            // Smooth follow for outline
+            // We use simple lerp here for vanilla feel, or GSAP
+            // Let's use GSAP's quickSetter or just a tween for simplicity in loop
+            
+            // However, simple lerp is often cleaner for cursor trails
+            cursor.x += (targetX - cursor.x) * config.smoothing;
+            cursor.y += (targetY - cursor.y) * config.smoothing;
+
+            // Apply transform
+            cursorOutline.style.transform = `translate(${cursor.x}px, ${cursor.y}px) translate(-50%, -50%)`;
+
+            // Reset magnetic element position when not hovering
+            if (!isHoveringMagnetic && magneticTarget === null) {
+                 // We need to find elements that were moved and reset them
+                 // For simplicity in this demo, we reset all magnetic elements in the loop 
+                 // or just handle it on mouseleave. 
+                 // Mouseleave is better for performance.
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Helper to reset element positions on mouseleave
+        document.querySelectorAll('[data-magnetic]').forEach(el => {
+            el.addEventListener('mouseleave', () => {
+                gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.5)" });
+            });
+        });
+
+        animate();
+
+    </script>
+</body>
+</html>

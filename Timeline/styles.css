@@ -1,0 +1,228 @@
+/* 基础重置与字体设置 */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* 现代无衬线字体 */
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6; /* 浅灰色背景 */
+    color: #333;
+}
+
+/* 列表基础样式：去除默认点和边距 */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+header {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 30px;
+}
+
+/* 时间轴主容器 - 使用 Flexbox 实现垂直布局 */
+.timeline {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ------------------- 年份层级 ------------------- */
+.year-item {
+    border-left: 5px solid #007bff; /* 醒目的年份线条 */
+    padding-left: 20px;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+.year-title {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    display: inline-block;
+    margin-left: -25px; /* 标题与线条对齐 */
+    margin-top: 0;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+/* ------------------- 季度层级 ------------------- */
+.quarter-list {
+    margin-top: 20px;
+}
+
+.quarter-item {
+    padding: 15px 0;
+    border-left: 3px solid #ced4da; /* 稍细的季度线条 */
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+
+.quarter-title {
+    color: #495057;
+    margin: 0;
+    font-size: 1.5em;
+}
+
+/* ------------------- 月份层级 ------------------- */
+.month-list {
+    margin-top: 10px;
+}
+
+.month-item {
+    padding: 10px 0;
+    border-left: 1px dashed #adb5bd; /* 月份使用虚线 */
+    padding-left: 10px;
+    margin-bottom: 15px;
+}
+
+.month-title {
+    color: #6c757d;
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: normal;
+}
+
+/* ------------------- 周层级 ------------------- */
+.week-list {
+    margin-top: 8px;
+}
+
+.week-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 5px 0;
+    margin-bottom: 5px;
+    gap: 15px;
+}
+
+.week-label {
+    flex-shrink: 0; /* 不缩小 */
+    font-weight: bold;
+    color: #495057;
+    width: 70px; /* 固定宽度，方便对齐 */
+}
+
+.week-detail {
+    flex-grow: 1;
+    background-color: #ffffff; /* 周详情使用白色卡片 */
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.week-detail p {
+    margin: 0 0 5px 0;
+    font-size: 0.95em;
+}
+
+.date-range {
+    color: #868e96;
+    font-style: italic;
+}
+
+/* 里程碑颜色编码 (现代简洁风格) */
+.milestone {
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.milestone.work {
+    background-color: #e9ecef;
+    color: #007bff;
+}
+
+.milestone.personal {
+    background-color: #e6fcf5;
+    color: #20c997;
+}
+
+.milestone.travel {
+    background-color: #fff3e0;
+    color: #fd7e14;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    overflow-x: hidden; /* 防止动画超出视口导致的滚动条 */
+}
+
+/* 时间轴主容器 */
+.timeline {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 垂直线条设计 */
+.year-list {
+    padding-left: 20px; /* 留出线条空间 */
+}
+.year-item {
+    border-left: 5px solid #007bff; /* 年份主线条 */
+    padding-left: 25px;
+    margin-bottom: 50px;
+}
+.quarter-item {
+    border-left: 3px solid #ced4da;
+    padding-left: 20px;
+    margin-bottom: 25px;
+}
+.month-item {
+    border-left: 1px dashed #adb5bd;
+    padding-left: 15px;
+    margin-bottom: 15px;
+}
+
+/* ------------------- 动画初始状态 ------------------- */
+/* 为所有动画元素设置初始的透明度和位移 */
+.timeline-item {
+    opacity: 0;
+    transform: translateX(-50px); /* 让元素从左侧移入 */
+    transition: none; /* 禁用默认CSS过渡，交由GSAP控制 */
+}
+
+/* 标题样式 (保留上一个回答中的简洁卡片样式) */
+.year-title {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    display: inline-block;
+    margin-left: -32px; /* 标题与线条对齐 */
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+.quarter-title { color: #495057; font-size: 1.5em; margin-bottom: 5px;}
+.month-title { color: #6c757d; font-size: 1.2em; font-weight: normal;}
+
+/* 周详情卡片 */
+.week-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+.week-label {
+    flex-shrink: 0;
+    font-weight: bold;
+    color: #495057;
+    width: 70px;
+}
+.week-detail {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    flex-grow: 1;
+}

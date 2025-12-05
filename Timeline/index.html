@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSAP 人生时间轴</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>⏳ 人生时间轴 GSAP 版</h1>
+        <p>滚动查看我的每一年、每一季度、每一周。</p>
+    </header>
+
+    <main class="timeline">
+        
+        <ul class="year-list">
+
+            <li class="year-item timeline-item">
+                <h2 class="year-title">2025</h2>
+                <ul class="quarter-list">
+
+                    <li class="quarter-item timeline-item">
+                        <h3 class="quarter-title">Q1 - 第一季度</h3>
+                        
+                        <ul class="month-list">
+
+                            <li class="month-item timeline-item">
+                                <h4 class="month-title">一月</h4>
+                                <ul class="week-list">
+
+                                    <li class="week-item timeline-item">
+                                        <span class="week-label">第 1 周</span>
+                                        <div class="week-detail">里程碑：项目A启动会议</div>
+                                    </li>
+
+                                    <li class="week-item timeline-item">
+                                        <span class="week-label">第 2 周</span>
+                                        <div class="week-detail">里程碑：完成阅读《Atomic Habits》</div>
+                                    </li>
+                                </ul>
+                            </li>
+                            
+                            <li class="month-item timeline-item">
+                                <h4 class="month-title">二月</h4>
+                                <ul class="week-list">
+                                    <li class="week-item timeline-item">
+                                        <span class="week-label">第 5 周</span>
+                                        <div class="week-detail">里程碑：春节假期旅行</div>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li> 
+
+                    <li class="quarter-item timeline-item">
+                        <h3 class="quarter-title">Q2 - 第二季度</h3>
+                    </li>
+
+                </ul>
+            </li>
+
+            <li class="year-item timeline-item">
+                <h2 class="year-title">2024</h2>
+            </li>
+
+        </ul>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

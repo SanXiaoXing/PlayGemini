@@ -1,11 +1,7 @@
 {
   "version": 2,
-  "cleanUrls": true,
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
-    { "source": "/Particle_Effects/(.*)", "destination": "/src/Particle_Effects/$1" },
-    { "source": "/Timeline/(.*)", "destination": "/src/Timeline/$1" },
-    { "source": "/cursor/(.*)", "destination": "/src/cursor/$1" },
     { "source": "/(.*)", "destination": "/$1" }
   ]
 }

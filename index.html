@@ -26,8 +26,10 @@ body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSyst
 .card-title{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--fg)}
 .card-desc{font-size:14px;line-height:1.7;color:var(--muted)}
 .card-link{position:absolute;inset:0}
-.footer{display:flex;justify-content:center;margin-top:40px;color:var(--muted);font-size:12px}
+.footer{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:40px;color:var(--muted);font-size:12px}
 .badge{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.03)}
+.source-link{display:inline-flex;align-items:center;gap:8px;color:var(--primary);text-decoration:none}
+.source-link:hover{filter:brightness(1.1)}
 .badge-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);box-shadow:0 0 12px var(--primary)}
 </style>
 </head>
@@ -43,11 +45,20 @@ body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSyst
   <div class="grid" id="grid"></div>
 
   <div class="footer">
-    <div class="badge"><span class="badge-dot"></span><span>© <span id="year"></span> SanXiaoXing</span></div>
-<script>
-const y=new Date().getFullYear();
-document.getElementById('year').textContent=y===2025?'2025':'2025-'+y;
-</script>
+    <div class="badge">
+      <span class="badge-dot"></span>
+      <span>© <span id="year"></span> SanXiaoXing</span>
+    </div>
+    <a class="source-link" href="https://github.com/SanXiaoXing/Blog/tree/main/play" target="_blank" rel="noopener noreferrer">
+      <span class="badge-dot"></span>
+      <span>查看源码</span>
+    </a>
+  </div>
+    
+    <script>
+      const y=new Date().getFullYear();
+      document.getElementById('year').textContent=y===2025?'2025':'2025-'+y;
+    </script>
   </div>
 </div>
 

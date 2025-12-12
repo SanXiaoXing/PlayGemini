@@ -13,5 +13,20 @@
     "title": "粒子特效集合",
     "desc": "多种粒子特效演示页面",
     "href": "src/Particle_Effects/index.html"
+  },
+  {
+    "title": "横向时间轴组件",
+    "desc": "基于GSAP的横向时间轴组件",
+    "href": "src/Horizontal_Timeline/index.html"
+  },
+  {
+    "title": "横向时间轴组件2",
+    "desc": "基于GSAP的横向时间轴组件2",
+    "href": "src/Horizontal_Timeline/timeline.html"
+  },
+  {
+    "title": "数字动画组件",
+    "desc": "基于GSAP的数字动画组件",
+    "href": "src/AnimateNumber/index.html"
   }
 ]

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSAP Horizontal Timeline</title>
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --bg-color: #f4f4f4;
+            --line-color: #cfcfcf;
+            --node-color: #888;
+            --active-color: #333;
+            --text-color: #333;
+            --subtext-color: #777;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden; /* Hide horizontal scrollbar */
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The Viewport (Mask) */
+        .timeline-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px; /* ample height for tooltips */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        /* The Moving Track */
+        .timeline-track {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            left: 50%; /* Start roughly centered */
+            transform: translateX(-50%); /* Center the starting block */
+            gap: 120px; /* Space between nodes */
+            padding: 0 50vw; /* Padding ensures first/last nodes can reach center */
+            transition: none; /* GSAP handles movement */
+        }
+
+        /* The Horizontal Line */
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--line-color);
+            z-index: 0;
+        }
+
+        /* Individual Node Container */
+        .node {
+            position: relative;
+            z-index: 1;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The Dot */
+        .node-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--bg-color);
+            border: 3px solid var(--node-color);
+            transition: border-color 0.3s ease;
+        }
+
+        /* The Tooltip (Content) */
+        .node-content {
+            position: absolute;
+            bottom: 35px; /* Position above the dot */
+            width: 200px;
+            text-align: center;
+            opacity: 0; /* Hidden initially */
+            visibility: hidden;
+            transform: translateY(10px); /* Slide up effect origin */
+            pointer-events: none; /* Prevent flickering on hover */
+        }
+
+        /* Typography */
+        .node-date {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--node-color);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .node-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--active-color);
+            margin: 0;
+        }
+
+        .node-subtext {
+            font-size: 0.85rem;
+            color: var(--subtext-color);
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* Vertical Line connector in tooltip */
+        .node-content::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 15px;
+            background-color: var(--line-color);
+        }
+
+        /* Active State Styles (Applied via JS class or hover logic) */
+        .node.active .node-dot {
+            border-color: var(--active-color);
+            background-color: var(--active-color);
+            transform: scale(1.2);
+        }
+
+        .node.active .node-date {
+            color: var(--active-color);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="timeline-wrapper">
+        <div class="timeline-track">
+            <div class="timeline-line"></div>
+
+            <div class="node">
+                <div class="node-content">
+                    <div class="node-date">10 Jan 2023</div>
+                    <h3 class="node-title">PROFILE CREATED</h3>
+                    <div class="node-subtext">by Yuri Nelson</div>
+                </div>
+                <div class="node-dot"></div>
+            </div>
+
+            <div class="node">
+                <div class="node-content">
+                    <div class="node-date">15 Feb 2023</div>
+                    <h3 class="node-title">INITIAL COMMIT</h3>
+                    <div class="node-subtext">Repo Setup</div>
+                </div>
+                <div class="node-dot"></div>
+            </div>
+
+            <div class="node">
+                <div class="node-content">
+                    <div class="node-date">22 Mar 2023</div>
+                    <h3 class="node-title">DESIGN PHASE</h3>
+                    <div class="node-subtext">Approved by Client</div>
+                </div>
+                <div class="node-dot"></div>
+            </div>
+
+            <div class="node">
+                <div class="node-content">
+                    <div class="node-date">05 Apr 2023</div>
+                    <h3 class="node-title">BETA LAUNCH</h3>
+                    <div class="node-subtext">v0.5.0 Release</div>
+                </div>
+                <div class="node-dot"></div>
+            </div>
+
+            <div class="node">
+                <div class="node-content">
+                    <div class="node-date">12 Jun 2023</div>
+                    <h3 class="node-title">USER TESTING</h3>
+                    <div class="node-subtext">Feedback Loop</div>
+                </div>
+                <div class="node-dot"></div>
+            </div>
+
+            <div class="node">
+                <div class="node-content">
+                    <div class="node-date">30 Aug 2023</div>
+                    <h3 class="node-title">OFFICIAL RELEASE</h3>
+                    <div class="node-subtext">Global Rollout</div>
+                </div>
+                <div class="node-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../home-button.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        // --- GSAP & INTERACTION LOGIC ---
+
+        const nodes = document.querySelectorAll('.node');
+        const track = document.querySelector('.timeline-track');
+
+        // Initialize: Loop through nodes to set up hover events
+        nodes.forEach((node, index) => {
+            const content = node.querySelector('.node-content');
+            const dot = node.querySelector('.node-dot');
+
+            // Hover IN
+            node.addEventListener('mouseenter', () => {
+                // 1. Center the node in the viewport
+                centerNode(node);
+
+                // 2. Animate current node content IN
+                gsap.to(content, {
+                    autoAlpha: 1, // handles opacity + visibility
+                    y: 0,         // slide up to natural position
+                    duration: 0.4,
+                    ease: "power2.out"
+                });
+
+                // 3. Highlight the dot
+                gsap.to(dot, {
+                    scale: 1.3,
+                    backgroundColor: "#333",
+                    borderColor: "#333",
+                    duration: 0.3
+                });
+
+                // 4. Fade out other nodes (Focus effect)
+                nodes.forEach(otherNode => {
+                    if (otherNode !== node) {
+                        gsap.to(otherNode.querySelector('.node-content'), {
+                            autoAlpha: 0,
+                            y: 10,
+                            duration: 0.3
+                        });
+                        gsap.to(otherNode.querySelector('.node-dot'), {
+                            scale: 1,
+                            backgroundColor: "#f4f4f4",
+                            borderColor: "#888",
+                            duration: 0.3
+                        });
+                    }
+                });
+            });
+        });
+
+        // Function to center the active node
+        function centerNode(targetNode) {
+            // Get viewport center
+            const viewportCenter = window.innerWidth / 2;
+            
+            // Get node's position relative to the track
+            // offsetLeft gives distance from left edge of track to left edge of node
+            // offsetWidth / 2 gets us to the center of the node
+            const nodeCenterInTrack = targetNode.offsetLeft + (targetNode.offsetWidth / 2);
+            
+            // Calculate how much we need to shift the track
+            // We want: NewTrackX + nodeCenterInTrack = viewportCenter
+            // So: NewTrackX = viewportCenter - nodeCenterInTrack
+            const moveVal = viewportCenter - nodeCenterInTrack;
+
+            gsap.to(track, {
+                x: moveVal,
+                duration: 0.8,
+                ease: "power3.inOut" // Smooth slow-fast-slow movement
+            });
+        }
+
+        // Initial Centering: Trigger the first node on load (optional)
+        // Simulate a hover on the first node so the user sees how it works immediately
+        window.addEventListener('load', () => {
+             // Dispatch a mouseenter event on the first node
+             const event = new Event('mouseenter');
+             nodes[0].dispatchEvent(event);
+        });
+
+        // Responsiveness: Re-center on resize
+        window.addEventListener('resize', () => {
+            // Find which node is currently 'active' (scaled up) and re-center it
+            // For simplicity in this demo, we just re-trigger the logic if a node was highlighted
+            // or simply reset. Here we do nothing to keep it simple, 
+            // but in production, you might debounce a re-center call.
+        });
+
+    </script>
+</body>
+</html>

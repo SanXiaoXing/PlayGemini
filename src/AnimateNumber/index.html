@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive AnimateNumber Counter</title>
+    <style>
+        /* 1. 整体容器和背景样式 */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7f9;
+        }
+
+        /* 2. 核心计数器组件样式 */
+        .animate-number-container {
+            padding: 30px 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .label {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* 3. 字体和布局 */
+        .number-display {
+            font-size: 4rem; /* 核心数字大小 */
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            justify-content: center;
+            line-height: 1.1;
+            margin-bottom: 25px;
+        }
+
+        /* 4. 自定义样式：利用描述中的CSS类 */
+        .prefix {
+            color: #20c997; /* 强调前缀 (e.g., Currency Symbol) */
+            margin-right: 5px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .integer {
+            /* 主体数字部分 */
+            color: #1e293b;
+        }
+
+        .fraction {
+            color: #adb5bd; /* 小数部分颜色较浅 */
+            font-size: 3rem; /* 相对小一点 */
+            align-self: flex-end; /* 与整数部分对齐 */
+        }
+
+        .suffix {
+            color: #007bff; /* 强调后缀 (e.g., Unit) */
+            margin-left: 5px;
+            font-size: 2rem;
+            align-self: flex-end;
+            opacity: 0.9;
+        }
+
+        /* 5. 交互按钮组 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* 增加按钮样式 */
+        .increase-btn {
+            background-color: #28a745; /* 绿色 */
+            color: white;
+        }
+        .increase-btn:hover {
+            background-color: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        /* 减少按钮样式 */
+        .decrease-btn {
+            background-color: #dc3545; /* 红色 */
+            color: white;
+        }
+        .decrease-btn:hover {
+            background-color: #bd2130;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="animate-number-container">
+    <div class="label">Interactive Inventory Count (Units)</div>
+    
+    <div id="counter" class="number-display">
+        <span class="prefix" id="prefix-span"></span>
+        <span class="integer" id="integer-span">1,000</span>
+        <span class="fraction" id="fraction-span"></span>
+        <span class="suffix" id="suffix-span"> Units</span>
+    </div>
+
+    <div class="controls">
+        <button class="decrease-btn" onclick="updateCounter(-100)">
+            <span style="font-size: 1.2rem;">-</span> 减少 100
+        </button>
+        <button class="increase-btn" onclick="updateCounter(100)">
+            <span style="font-size: 1.2rem;">+</span> 增加 100
+        </button>
+    </div>
+    </div>
+
+    <script src="../home-button.js"></script>
+<script>
+    let currentValue = 1000; // 初始状态值
+    const DURATION = 500; // 动画时长 (ms)
+    let animationFrameId = null; // 用于取消上一个动画帧
+
+    /**
+     * Framer Motion 启发式的动画函数
+     * @param {number} startValue - 动画起始值
+     * @param {number} endValue - 动画目标值
+     */
+    function animate(startValue, endValue) {
+        // 如果有正在运行的动画，先取消它
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+
+        const startTime = performance.now();
+
+        // 格式化器：这里我们使用普通的数字格式，没有小数，但添加了单位后缀
+        const formatter = new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        });
+
+        const integerSpan = document.getElementById('integer-span');
+        const fractionSpan = document.getElementById('fraction-span');
+        
+        // 确保前缀和后缀不变，只更新中间的数字
+        const suffixSpan = document.getElementById('suffix-span');
+        suffixSpan.textContent = " Units";
+
+        function step(currentTime) {
+            const elapsed = currentTime - startTime;
+            // 模拟 ease-out 效果，这里简化为线性，实际 Motion 会更平滑
+            const progress = Math.min(elapsed / DURATION, 1);
+            
+            // 线性插值
+            const intermediateValue = startValue + (endValue - startValue) * progress;
+            
+            // 实时格式化当前值
+            const formatted = formatter.format(Math.round(intermediateValue));
+            
+            // 由于我们没有小数，直接更新整数部分
+            integerSpan.textContent = formatted;
+
+            if (progress < 1) {
+                // 持续动画
+                animationFrameId = requestAnimationFrame(step);
+            } else {
+                // 动画结束
+                animationFrameId = null;
+            }
+        }
+
+        // 启动动画
+        animationFrameId = requestAnimationFrame(step);
+    }
+
+    /**
+     * 公共更新函数，由按钮调用
+     * @param {number} delta - 要增加或减少的数量
+     */
+    function updateCounter(delta) {
+        const startValue = currentValue;
+        currentValue += delta;
+        const endValue = currentValue;
+
+        // 确保数字不小于 0
+        if (endValue < 0) {
+            currentValue = 0;
+            return; 
+        }
+
+        animate(startValue, endValue);
+    }
+    
+    // 页面加载时初始化显示
+    document.addEventListener('DOMContentLoaded', () => {
+        // 首次加载时，确保初始值是格式化后的
+        document.getElementById('integer-span').textContent = new Intl.NumberFormat('en-US').format(currentValue);
+    });
+
+</script>
+</body>
+</html>
